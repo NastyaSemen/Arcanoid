@@ -40,11 +40,20 @@ if __name__ == '__main__':
 
     sprites = get_sprites()
 
+    sprites.image = load_image('Platform.png')
+    sprites.rect = sprites.image.get_rect()
+
     running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+
+            if pygame.key.get_pressed()[pygame.K_LEFT]:
+                sprites.rect.x -= 10
+
+            if pygame.key.get_pressed()[pygame.K_RIGHT]:
+                sprites.rect.x += 10
         draw(sprites, screen)
 
         pygame.display.flip()

@@ -3,9 +3,12 @@ import sys
 import pygame
 from Drawer import *
 from Sprites.Platform import Platform
+from Event.EventBus import EventBus
+from Event.Event import Event
 
 
 size = width, height = 800, 600
+eventBus = EventBus()
 
 
 def load_image(name, colorkey=None):
@@ -27,6 +30,7 @@ def load_image(name, colorkey=None):
 def get_sprites():
     sprites = []
     platform = Platform(width // 2, 400)
+    eventBus.add_subscriber(platform)
     sprites.append(platform)
     return sprites
 
@@ -40,23 +44,25 @@ if __name__ == '__main__':
 
     sprites = get_sprites()
 
-    sprites.image = load_image('Platform.png')
-    sprites.rect = sprites.image.get_rect()
-
     running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-            if pygame.key.get_pressed()[pygame.K_LEFT]:
-                sprites.rect.x -= 10
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    eventBus.publish_event(Event('MOVE_LEFT', None))
+                if event.key == pygame.K_RIGHT:
+                    eventBus.publish_event(Event('MOVE_RIGHT', None))
 
-            if pygame.key.get_pressed()[pygame.K_RIGHT]:
-                sprites.rect.x += 10
+            if event.type == pygame.KEYUP:
+                pass
+
         draw(sprites, screen)
 
         pygame.display.flip()
 
-    pygame.quit()
+        screen.blit(back, (0, 0))
 
+    pygame.quit()

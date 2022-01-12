@@ -1,14 +1,19 @@
 import os
 import sys
-import pygame
 from Drawer import *
 from Sprites.Platform import Platform
+from Sprites.Ball import Ball
 from Event.EventBus import EventBus
 from Event.Event import Event
+from GameData import GameData
 
 
+gameData = GameData()
 size = width, height = 800, 600
-eventBus = EventBus()
+gameData.set("WIDTH", width)
+gameData.set("HEIGHT", height)
+gameData.set("MOVE_EVENT_BUS", EventBus())
+gameData.set("GAME_EVENT_BUS", EventBus())
 
 
 def load_image(name, colorkey=None):
@@ -29,9 +34,8 @@ def load_image(name, colorkey=None):
 
 def get_sprites():
     sprites = []
-    platform = Platform(width // 2, 400)
-    eventBus.add_subscriber(platform)
-    sprites.append(platform)
+    sprites.append(Platform(gameData))
+    sprites.append(Ball(gameData))
     return sprites
 
 
@@ -41,6 +45,7 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode(size)
     back = pygame.transform.scale(load_image('level_one_back.jpg'), (width, height))
     screen.blit(back, (0, 0))
+    clock = pygame.time.Clock()
 
     sprites = get_sprites()
 
@@ -52,17 +57,17 @@ if __name__ == '__main__':
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
-                    eventBus.publish_event(Event('MOVE_LEFT', None))
+                    gameData.get("MOVE_EVENT_BUS").publish_event(Event("MOVE_LEFT", None))
                 if event.key == pygame.K_RIGHT:
-                    eventBus.publish_event(Event('MOVE_RIGHT', None))
+                    gameData.get("MOVE_EVENT_BUS").publish_event(Event("MOVE_RIGHT", None))
+                if event.key == pygame.K_SPACE:
+                    gameData.get("MOVE_EVENT_BUS").publish_event(Event("UNDOCK", None))
 
             if event.type == pygame.KEYUP:
                 pass
-
+        gameData.get("GAME_EVENT_BUS").publish_event(Event("UPDATE_SCREEN", None))
         draw(sprites, screen)
-
         pygame.display.flip()
-
         screen.blit(back, (0, 0))
-
+        clock.tick(50)
     pygame.quit()

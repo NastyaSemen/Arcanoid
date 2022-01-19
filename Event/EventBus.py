@@ -1,6 +1,7 @@
 class EventBus:
 
-    subscribes = set()
+    def __init__(self):
+        self.subscribes = set()
 
     def publish_event(self, event):
         for sb in self.subscribes:

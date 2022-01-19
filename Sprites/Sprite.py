@@ -18,8 +18,7 @@ class Sprite:
     image = None
 
     def __init__(self, x, y, image_path):
-        self.x = x
-        self.y = y
+        self.set_coords(x, y)
         self.image = load_image(image_path)
 
     def get_cords(self):
@@ -30,3 +29,7 @@ class Sprite:
 
     def on_event(self, event):
         pass
+
+    def set_coords(self, x, y):
+        self.x = x
+        self.y = y
